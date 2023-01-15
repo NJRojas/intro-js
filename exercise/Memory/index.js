@@ -24,21 +24,18 @@ function shuffle(array) {
 }
 
 function createBoard() {
-    let board = []
+    let board = FIGURES.concat(FIGURES)
+    return shuffle(board)
+}
+
+function createBoard2() {
+    let board = FIGURES.slice()
     for (let figure of FIGURES) {
-       board.push(figure)
        board.push(figure)
     }
     return shuffle(board)
 }
 
-function alternBoard() {
-    let board = FIGURES
-    for (let figure of FIGURES) {
-       board.push(figure)
-    }
-    return shuffle(board)
-}
 function printBoard() {
     
     let index = 0
@@ -58,5 +55,4 @@ function printBoard() {
     */
 }
 
-//console.log(createBoard())
-console.log(alternBoard())
+console.log(createBoard())

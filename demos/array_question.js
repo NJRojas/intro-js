@@ -22,7 +22,7 @@ function shuffle(array) {
 }
 
 function createBoard() {
-    let board = ['🐸', '🦖', '🦄', '🦊', '🐒', '🦉']
+    let board = FIGURES.slice()
     for (let figure of FIGURES) {
        board.push(figure)
     }
