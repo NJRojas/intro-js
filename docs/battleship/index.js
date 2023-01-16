@@ -136,15 +136,39 @@ function placeShips() {
         shufflePosition(shipSizes[i], playerA)
         shufflePosition(shipSizes[i], playerB)
     }
-    showStatus()
+    showStatus("A", playerA, boardA)
+    showStatus("B", playerB, boardB)
 }
 
-function shoot(positions, board, hits, shoots) {
+/**
+ * Selects a valid position, that is, it has not been shooted before
+ * and updates the board of the rival with the corresponding icon
+ * It requires
+ * @param {[Strings][Strings]}  target   List of shipment positions of the rival.
+ * @param {[Strings]}           board    Board of the rival.
+ * @param {[Strings]}           hits     Shoots of the current player that has been a hit.
+ * @param {[Strings]}           hits     A complete list of shoots the current player.
+ */
+function shoot(target, board, hits, shoots) {
 
-    let valid = false
+    let shoot
+    let index
+
+    // Get a valid  index
     do {
-        let index = getRandomInt(99)
-        let shoot = board[index]
+        index = getRandomInt(99)
+        // check for valid index
+        if (index >= 0 && index <= 99) {
+            let selectedPosition = board[index]
+
+            // Check if it is not a taken position
+            if (shoots.includes(selectedPosition)) {
+                continue
+            }
+            shoot = selectedPosition
+        }
+       
+        /*
         // Debugg line
         console.log(`selected index ${index} position ${shoot}`)
 
@@ -162,13 +186,26 @@ function shoot(positions, board, hits, shoots) {
              shoots.push(shoot)
              valid = true
         }    
-    } while (!valid)
+        */
+    } while (typeof shoot == 'undefined')
+
+    if (target.includes(shoot)) {
+        board[index] = '💥'
+        hits.push(shoot)
+    } else {
+        board[index] = '❌'
+    }
+     // track the shoot
+     shoots.push(shoot)
+
+    // Debugg line
+    console.log(`selected index ${index} position ${shoot}`)
  }
 
 function play() {
 
     let test = 5
-    let winner = ''
+    let winner
     let hitsOfA = []
     let hitsOfB = []
     let positionsA = playerA.flatMap(num => num)
@@ -176,16 +213,18 @@ function play() {
     
     do {
         // Turn of playerA
-        console.log(`Turn for player A`)
+        console.log(`\nTurn for player A`)
         shoot(positionsB, boardB, hitsOfA, shootsA)
-  
+        console.log(`Current status for`)
+        showStatus("B", playerB, boardB)
+
         // Turn of playerB
-        console.log(`Turn for player B`)
+        console.log(`\nTurn for player B`)
         shoot(positionsA, boardA, hitsOfB, shootsB)
+        console.log(`Current status for`)
+        showStatus("A", playerA, boardA)
 
         test -= 1
-        showStatus()
-
         if (hitsOfA.length == positionsB.length) {
             winner = 'THE WINNER IS A'
         } else if (hitsOfB.length == positionsA.length) {
@@ -239,17 +278,12 @@ function printBoard(player, board) {
     console.log(graphicBoard)
 }
 
-function showStatus() {
+function showStatus(player, playerPositions, board) {
 
-    console.log(`Player A`)
+    console.log(`Player ${player}`)
     //console.log(`Shipment positions`)
-    //console.log(playerA)
-    printBoard(playerA, boardA)
-
-    console.log(`Player B`)
-    //console.log(`Shipment positions`)
-    //console.log(playerB)
-    printBoard(playerB, boardB)
+    //console.log(playerPositions)
+    printBoard(playerPositions, board)
 }
 
 function update(board, position, update) {
@@ -278,7 +312,6 @@ placeShips()
 
 // 3. Play
 console.log('***************************************************************')
-console.log('Let us the game begin ')
+console.log('Let us begin the game')
 console.log('***************************************************************')
-
 play()
