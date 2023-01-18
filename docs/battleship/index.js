@@ -1,24 +1,36 @@
 /*
-  Leyenda
+  Description
   🛶 -> Ship of 2 positions
   🛥️ -> Ship of 3 positions
   ⛴️ -> Ship of 4 positions
   🚢 -> Ship of 5 positions
   💥 -> Hit a ship
-  ❌ -> Water or missing shot
-  🔥 -> Ship sunken
+  💧 -> Water or missing shot
+  🔥 -> Represent a position of a sunken ship
   ' ' -> Empty position
 */
 
 const letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
 const shipSizes = [2, 2, 2, 3, 3, 4, 5]
 const dimention = 10
+const icons = {
+    ship2: '🛶',
+    ship3: '⛵️',
+    ship4: '🚤',
+    ship5: '🚢',
+    hit: '💥',
+    water: '💧',
+    sunk: '🔥',
+    empty: "' '"
+}
+const line = '________________________________________________________________________'
 
 let playerA = {
     name: 'A',
     board: [],
     shipPositions: [],
     hits: [],
+    turns: 0,
     shoots : [],
     trials: []
 }
@@ -28,13 +40,14 @@ let playerB = {
     board: [],
     shipPositions: [],
     hits: [],
+    turns: 0,
     shoots : [],
     trials: []
 }
 
 /**
  * Generates a board of 10 x 10
- * @returns {[String]} board    an array of 100 elements with indexes
+ * @returns {[String]}  A board, which is an array of 100 elements full of indexes
  */
 function generateBoard() {
     let board = []
@@ -56,9 +69,9 @@ function getRandomInt(max = dimention) {
 
 /**
  * Select in a random way between 2 options, simulate a flip coin
- * @param {String} optionA Option 1 to flip
- * @param {String} optionB Option 2 to flip
- * @returns {String} the option flipped
+ * @param   {String} optionA Option 1 to flip
+ * @param   {String} optionB Option 2 to flip
+ * @returns {String} option result
  */
 function flipChoice(optionA = 'A', optionB = 'B') {
     const value = Math.random()
@@ -172,56 +185,62 @@ function shoot(shooter, rival, target) {
 
     } while (typeof shot == 'undefined')
 
+    // track shots
+    shooter.shoots.push(shot)
+
     if (target.includes(shot)) {
-        rival.board[index] = '💥'
+        rival.board[index] = icons.hit
         shooter.hits.push(shot)
 
-        // track shots
-        shooter.shoots.push(shot)
-
         console.log(`shoot position: ${shot} -> ${rival.board[index]}, you hit a ship, you rock ☄️`)
-        //console.log(`Updating board of...`)
-        //showStatus(rival)
 
-        // Current player hit, it can play again
-        shoot(shooter, rival, target)
-
-    } else {
-        rival.board[index] = '❌'
+        // Current player hit, he/she can play again, but first check that not all rival ships are sunk
+        if (shooter.hits.length < target.length) {
+            shoot(shooter, rival, target)
+        } else {
+            console.log(`Updating board of player ${rival.name}`)
+            printBoard(rival)
+        }
         
-        // track shots
-        shooter.shoots.push(shot)
+    } else {
+        rival.board[index] = icons.water
         console.log(`shoot position: ${shot} -> ${rival.board[index]}`)
-        console.log(`\nUpdating board of...`)
-        showStatus(rival)
+        console.log(`Updating board of player ${rival.name}`)
+        printBoard(rival)
     }
  }
 
 function play() {
 
-    console.log('***************************************************************')
-    console.log('Let us begin the game')
-    console.log('***************************************************************\n')
+    console.log(`\n${line}\n\nLet us begin the game\n${line}`)
 
     let winner
     let flatShipPositionsA = playerA.shipPositions.flatMap(num => num)
     let flatShipPositionsB = playerB.shipPositions.flatMap(num => num)
     
+    let currentPlayer = playerA
+    let rival = playerB
+    let targetPositions = flatShipPositionsB
+
     do {
-        console.log(`\nMove #${playerA.shoots.length + 1}`)
-
-        // Turn of playerA
-        console.log(`\nTurn for player ${playerA.name}`)
-        shoot(playerA, playerB, flatShipPositionsB)
+        currentPlayer.turns += 1
+        console.log(`\nTurn for player ${currentPlayer.name} \nMove #${currentPlayer.turns}`)
+        shoot(currentPlayer, rival, targetPositions)
         
-        // Turn of playerB
-        console.log(`\nTurn for player ${playerB.name}`)
-        shoot(playerB, playerA, flatShipPositionsA)
+        if (currentPlayer.hits.length == targetPositions.length) {
+            winner = `THE WINNER IS ${currentPlayer.name}`
+            break
+        }
 
-        if (playerA.hits.length == flatShipPositionsB.length) {
-            winner = 'THE WINNER IS A'
-        } else if (playerB.hits.length == flatShipPositionsB.length) {
-            winner = 'THE WINNER IS B'
+        // Swap current player
+        if (currentPlayer.name == 'A') {
+            currentPlayer = playerB
+            rival = playerA
+            targetPositions = flatShipPositionsA
+        } else {
+            currentPlayer = playerA
+            rival = playerB
+            targetPositions = flatShipPositionsB
         }
 
     } while (typeof winner == 'undefined') //(playerA.shoots.length <= 20)//
@@ -240,21 +259,9 @@ function printBoard(player) {
 
         for (j = 0; j < ship.length; j++) {
             let index = graphicBoard.indexOf(ship[j])
-            switch(ship.length) {
-                case 2:
-                    update(graphicBoard, index, '🛶')
-                    break;
-                case 3:
-                    update(graphicBoard, index, '⛵️')
-                    break;
-                case 4:
-                    update(graphicBoard, index, '🚤')
-                    break;
-                case 5:
-                    update(graphicBoard, index, '🚢')
-                    break;
-                default:
-                    break;
+            const icon = iconFor(ship.length)
+            if (icon.length > 0 && (icon != icons.hit || icon != icons.sunk)) {
+                graphicBoard[index] = icon
             }
         }
     }
@@ -262,33 +269,32 @@ function printBoard(player) {
     // translate empty positions
     for (i = 0; i < graphicBoard.length; i++) {
         if (!isIcon(graphicBoard[i])) {
-            graphicBoard[i] = "' '"
+            graphicBoard[i] = icons.empty
         }
     }
 
-    const line = '\n-----------------------------------------------------------------------'
-    const vertical = '\n|         |     |     |     |     |     |     |     |     |     |     |'
-    const header = `\n| (INDEX) |  0  |  1  |  2  |  3  |  4  |  5  |  6  |  7  |  8  |  9  |`
-    let board = `${line}${vertical}${header}${vertical}${line}`
+    const boardLine = '\n-----------------------------------------------------------------------'
+    const vertical  = '\n|         |     |     |     |     |     |     |     |     |     |     |'
+    const header    = `\n| (INDEX) |  0  |  1  |  2  |  3  |  4  |  5  |  6  |  7  |  8  |  9  |`
+    let board = `${boardLine}${vertical}${header}${boardLine}` //`${line}${vertical}${header}${vertical}${line}`
 
     for (let i = 0; i < letters.length; i++) {
         let row = `|    ${letters[i]}    |`
         for (let j = 0; j < letters.length; j++) {
             const index = (i * 10) + j
             if (isIcon(graphicBoard[index])) {
-                row += `  ${graphicBoard[index]} |`
+                row += ` ${graphicBoard[index]}  |`
             } else {
                 row += ` ${graphicBoard[index]} |`
             }
         }
-        board += `${vertical}\n${row}${vertical}${line}`
+        board += `${vertical}\n${row}${boardLine}` // `${vertical}\n${row}${vertical}${line}`
     }
     console.log(board)
-    //console.log(graphicBoard)
 }
 
 function isIcon(string) {
-    if (string == '🛶' || string == '⛵️' || string == '🚤' || string == '🚢' || string == '💥' || string == '❌' || string == '🔥') {
+    if (string == icons.ship2 || string == icons.ship3 || string == icons.ship4 || string == icons.ship5 || string == icons.hit || string == icons.water || string == icons.sunk) {
         return true
     } else {
         return false
@@ -312,12 +318,9 @@ function setupGame() {
 }
 
 function displaySetup() {
-    
-    console.log('\n****************************************************************************')
-    console.log('\n                              BATTLESHIP')
-    console.log('\n****************************************************************************')
-    const description = '\nDescription \n\n🛶  -> Ship of 2 positions \n⛵️   -> Ship of 3 positions \n🚤   -> Ship of 4 positions \n🚢  -> Ship of 5 positions \n💥  -> Hit a ship \n❌  -> Water or missing shot \n🔥  -> Ship sunken \n\' \' -> Empty position'
-    console.log(description)
+    const header = `${line}\n\n                              BATTLESHIP\n${line}`
+    const description = `\nDescription \n\n${icons.ship2}  -> Ship of 2 positions \n${icons.ship3}  -> Ship of 3 positions \n${icons.ship4}  -> Ship of 4 positions \n${icons.ship5}  -> Ship of 5 positions \n${icons.hit}  -> Hit a ship \n${icons.water}  -> Water or missing shot \n${icons.sunk}  -> Ship sunken \n${icons.empty} -> Empty position`
+    console.log(`${header}\n${description}`)
 
     showStatus(playerA)
     showStatus(playerB)
@@ -330,19 +333,24 @@ function showStatus(player) {
     printBoard(player)
 }
 
-function update(board, position, update) {
-    if (update != '💥') {
-        board[position] = update
+/**
+ * returns a ship icon representing a ship of the given legth
+ * @param {Int} length represents the lenght of a ship
+ * @returns {String}
+ */
+function iconFor(length) {
+    switch(length) {
+        case 2:
+            return icons.ship2
+        case 3:
+            return icons.ship3
+        case 4:
+            return icons.ship4
+        case 5:
+            return icons.ship5
+        default:
+            return '';
     }
-}
-
-function printBoardAlternative(player, board) {
-    let takenPositions = player.flatMap(num => num)
-    for (let i = 0; i < takenPositions.length; i++) {
-        let index = board.indexOf(takenPositions[i])
-        board[index] = '*'
-    }
-    console.log(board)
 }
 
 // 1. Setup Game
@@ -354,6 +362,7 @@ play()
 /* TODO
 
 1. Handle sunken
+2. adjust emojis 
 2. Divide in classes
 3. control no more than 100 shots
 4. Add documentation to functions
