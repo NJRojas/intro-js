@@ -22,22 +22,39 @@ const FIGURES = ['🤓', '🎃', '💚']
 console.log('Available figures: ', FIGURES)
 // tablero
 let board = []
-// por cada fila
-for(let i = 0; i < ROWS; i++) {
-    // una fila cualquiera
-    let row = []
-    // por cada columna
-    for(let j = 0; j < COLS; j++) {
-        //console.log(j, i)
-        row[j] = FIGURES[i]
+
+function printBoard2(board) {
+    // por cada fila
+    for(let i = 0; i < ROWS; i++) {
+        let line = ''
+        // por cada columna
+        for(let j = 0; j < COLS; j++) {
+            // line = line + ' '
+            line += board [i * COLS + j] // equivale a line = line + ''
+        }
+        console.log(line)
     }
-    board[i] = row
 }
-// console.log(board)
-console.log('Initial table')
-for(let i = 0; i < ROWS; i++) {
-    console.log(board[i])
+
+function printBoard() {
+    // por cada fila
+    for (let i = 0; i < ROWS; i++) {
+        // una fila cualquiera
+        let row = [];
+        // por cada columna
+        for (let j = 0; j < COLS; j++) {
+            //console.log(j, i)
+        row[j] = FIGURES[i];
+        }
+        board[i] = row;
+    }
+    // console.log(board)
+    console.log("Initial table");
+    for (let i = 0; i < ROWS; i++) {
+        console.log(board[i]);
+    }
 }
+
 // TODO Generar selección de cartas de forma aleatoria.
 // TODO Mostrarla por pantalla hasta que quede solucionado el juego.
 // TODO Una vez terminado el juego, se mostrarán algunas estadísticas.
@@ -61,3 +78,5 @@ function shuffle(array) {
   
     return array;
 }
+
+printBoard(board)

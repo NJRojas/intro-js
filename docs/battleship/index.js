@@ -233,10 +233,6 @@ function printBoard(player) {
     
     // Copy board
     let graphicBoard = player.board.slice()
-
-    if (graphicBoard.length > 100) {
-        console.log(`\nPlayer ${player.name} \nOriginal Board length: ${player.board.length} - Graphic Board length: ${graphicBoard.length}`)
-    }
     
     // Place ships graphically
     for (i = 0; i < player.shipPositions.length; i++) {
@@ -359,6 +355,7 @@ play()
 
 1. Handle sunken
 2. Divide in classes
-3. Add documentation
-4.
+3. control no more than 100 shots
+4. Add documentation to functions
+5. Optimized
 */
