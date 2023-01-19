@@ -23,6 +23,7 @@ const icons = {
     sunk: '🔥',
     empty: "' '"
 }
+const iconList = ['🛶', '⛵️', '🚤', '🚢', '💥', '💧', '🔥']
 const line = '________________________________________________________________________'
 
 let playerA = {
@@ -83,10 +84,12 @@ function flipChoice(optionA = 'A', optionB = 'B') {
 }
 
 /**
- * Generate a random position for a ship, a set of points
+ Generate a random position for a ship, a set of points
  * and updates the given list
+ * @param {Int} size 
+ * @param {[]} shipList 
  */
-function shufflePosition(size = 0, shipList = []) {
+function shuffleShipPositions(size = 0, shipList = []) {
 
     let postionSet = []
     const takenPositions = shipList.flatMap(num => num)
@@ -156,7 +159,7 @@ function shufflePosition(size = 0, shipList = []) {
 
 function placeShips(player) {
     for(let i = 0; i < shipSizes.length; i++) {
-        shufflePosition(shipSizes[i], player.shipPositions)
+        shuffleShipPositions(shipSizes[i], player.shipPositions)
     }
 }
 
@@ -191,7 +194,6 @@ function shoot(shooter, rival, target) {
     if (target.includes(shot)) {
         rival.board[index] = icons.hit
         shooter.hits.push(shot)
-        updateSunkShips(rival)
 
         console.log(`shoot position: ${shot} -> ${rival.board[index]}, you hit a ship, you rock ☄️`)
 
@@ -269,7 +271,7 @@ function printBoard(player) {
 
     // translate empty positions
     for (i = 0; i < graphicBoard.length; i++) {
-        if (!isIcon(graphicBoard[i])) {
+        if (!iconList.includes(graphicBoard[i])) {
             graphicBoard[i] = icons.empty
         }
     }
@@ -277,19 +279,19 @@ function printBoard(player) {
     const boardLine = '\n-----------------------------------------------------------------------'
     const vertical  = '\n|         |     |     |     |     |     |     |     |     |     |     |'
     const header    = `\n| (INDEX) |  0  |  1  |  2  |  3  |  4  |  5  |  6  |  7  |  8  |  9  |`
-    let board = `${boardLine}${vertical}${header}${boardLine}` //`${line}${vertical}${header}${vertical}${line}`
+    let board = `${boardLine}${header}${boardLine}` //`${line}${vertical}${header}${vertical}${line}`
 
     for (let i = 0; i < letters.length; i++) {
         let row = `|    ${letters[i]}    |`
         for (let j = 0; j < letters.length; j++) {
             const index = (i * 10) + j
-            if (isIcon(graphicBoard[index])) {
-                row += ` ${graphicBoard[index]}  |`
-            } else {
+            if (graphicBoard[index] == "' '") {
                 row += ` ${graphicBoard[index]} |`
+            } else {
+                row += ` ${graphicBoard[index]}  |`
             }
         }
-        board += `${vertical}\n${row}${boardLine}` // `${vertical}\n${row}${vertical}${line}`
+        board += `\n${row}${boardLine}` // `${vertical}\n${row}${vertical}${line}`
     }
     console.log(board)
 }
@@ -311,14 +313,6 @@ function updateSunkShips(player) {
                 player.board[sunkIndexes[i]] = icons.sunk
             }
         } 
-    }
-}
-
-function isIcon(string) {
-    if (string == icons.ship2 || string == icons.ship3 || string == icons.ship4 || string == icons.ship5 || string == icons.hit || string == icons.water || string == icons.sunk) {
-        return true
-    } else {
-        return false
     }
 }
 
@@ -381,10 +375,11 @@ setupGame()
 play()
 
 /* TODO
-1. Handle sunken
+1. Handle sunk
 2. Print statistics
-2. Divide in classes
-3. control no more than 100 shots
-4. Add documentation to functions
-5. Optimized
+3. Divide in classes
+4. control no more than 100 shots
+5. Add documentation to functions
+6. Optimized
+7. Use trials
 */
