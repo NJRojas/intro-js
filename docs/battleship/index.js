@@ -191,6 +191,7 @@ function shoot(shooter, rival, target) {
     if (target.includes(shot)) {
         rival.board[index] = icons.hit
         shooter.hits.push(shot)
+        updateSunkShips(rival)
 
         console.log(`shoot position: ${shot} -> ${rival.board[index]}, you hit a ship, you rock ☄️`)
 
@@ -201,7 +202,7 @@ function shoot(shooter, rival, target) {
             console.log(`Updating board of player ${rival.name}`)
             printBoard(rival)
         }
-        
+
     } else {
         rival.board[index] = icons.water
         console.log(`shoot position: ${shot} -> ${rival.board[index]}`)
@@ -243,7 +244,7 @@ function play() {
             targetPositions = flatShipPositionsB
         }
 
-    } while (typeof winner == 'undefined') //(playerA.shoots.length <= 20)//
+    } while (typeof winner == 'undefined')
 
     console.log(winner)
 }
@@ -291,6 +292,26 @@ function printBoard(player) {
         board += `${vertical}\n${row}${boardLine}` // `${vertical}\n${row}${vertical}${line}`
     }
     console.log(board)
+}
+
+function updateSunkShips(player) {
+
+    for (i = 0; i < player.shipPositions.length; i++) {
+        let ship = player.shipPositions[i]
+        let sunkIndexes = []
+        for (j = 0; j < ship.length; j++) {
+            let index = player.board.indexOf(ship[j])
+            if (player.board[index] == icons.hit) {
+                sunkIndexes.push(index)
+            } 
+        }
+
+        if (sunkIndexes.length == ship.length) {
+            for (x = 0; x < sunkIndexes.length; x++) {
+                player.board[sunkIndexes[i]] = icons.sunk
+            }
+        } 
+    }
 }
 
 function isIcon(string) {
@@ -360,9 +381,8 @@ setupGame()
 play()
 
 /* TODO
-
 1. Handle sunken
-2. adjust emojis 
+2. Print statistics
 2. Divide in classes
 3. control no more than 100 shots
 4. Add documentation to functions
