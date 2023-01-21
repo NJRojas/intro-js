@@ -193,11 +193,18 @@ function shoot(shooter, rival, target) {
     shooter.shots.push(index)
 
     if (target.includes(index)) {
-        console.log(`shoot position: ${rival.board[index]} -> ${icons.hit}, you rock ☄️, you hit a ship`)
-
+        const hitPosition = rival.board[index]
+       
         rival.board[index] = icons.hit
         shooter.hits.push(index)
+        const log = checkForSunkShips(rival, index)
 
+        //Show log
+        if (log.length > 0) {
+            console.log(`Shot position: ${hitPosition} -> ${log}, you rock ☄️, you just sunk a ship`)
+        } else {
+            console.log(`Shot position: ${hitPosition} -> ${icons.hit}, Well done 👏🏻, you hit a ship`)
+        }
 
         // Current player hit, he/she can play again, but first check that not all rival ships are sunk
         if (shooter.hits.length < target.length) {
@@ -209,7 +216,7 @@ function shoot(shooter, rival, target) {
 
     } else {
         rival.board[index] = icons.water
-        console.log(`shoot position: ${shot} -> ${rival.board[index]}`)
+        console.log(`Shot position: ${shot} -> ${rival.board[index]}, you"ll do better next shot `)
         console.log(`Updating board of player ${rival.name}`)
         printBoard(rival)
     }
@@ -279,9 +286,8 @@ function printBoard(player) {
     }
 
     const boardLine = '\n-----------------------------------------------------------------------'
-    const vertical  = '\n|         |     |     |     |     |     |     |     |     |     |     |'
     const header    = `\n| (INDEX) |  0  |  1  |  2  |  3  |  4  |  5  |  6  |  7  |  8  |  9  |`
-    let board = `${boardLine}${header}${boardLine}` //`${line}${vertical}${header}${vertical}${line}`
+    let board = `${boardLine}${header}${boardLine}`
 
     for (let i = 0; i < letters.length; i++) {
         let row = `|    ${letters[i]}    |`
@@ -293,29 +299,78 @@ function printBoard(player) {
                 row += ` ${graphicBoard[index]}  |`
             }
         }
-        board += `\n${row}${boardLine}` // `${vertical}\n${row}${vertical}${line}`
+        board += `\n${row}${boardLine}`
     }
     console.log(board)
 }
 
-function updateSunkShips(player) {
+function checkForSunkShips(player, hit) {
 
+    let hitShip = []
+
+    // 1. Find the hit
+    for (i = 0; i < player.shipPositions.length; i++) {
+        const ship = player.shipPositions[i].slice()
+        for (j = 0; j < ship.length; j++) {
+            if (ship[j] == hit) {
+                hitShip = ship.slice()
+                break
+            }
+        }
+        
+        if (hitShip.length > 0 ) {
+            break
+        } 
+
+    }
+
+    if (hitShip.length == 0) {
+        return ""
+    } 
+
+    //2. Check if it is sunk
+    let isSunk = true
+    for (j = 0; j < hitShip.length; j++) {
+        const index = hitShip[j]
+        if (player.board[index] != icons.hit) {
+            isSunk = false
+            return ""
+        } 
+    }
+
+    //3. Update sunk ship
+    let sunkIcons = ""
+    for (x = 0; x < hitShip.length; x++) {
+        const index = hitShip[x]
+        player.board[index] = icons.sunk
+        sunkIcons += icons.sunk
+    }
+
+    return sunkIcons
+
+    /*
+    let sunkIcons = ""
     for (i = 0; i < player.shipPositions.length; i++) {
         let ship = player.shipPositions[i]
-        let sunkIndexes = []
+        let shipSunk = true
         for (j = 0; j < ship.length; j++) {
-            let index = player.board.indexOf(ship[j])
-            if (player.board[index] == icons.hit) {
-                sunkIndexes.push(index)
+            const index = ship[j]
+            if (player.board[index] != icons.hit) {
+                shipSunk = false
+                break
             } 
         }
 
-        if (sunkIndexes.length == ship.length) {
-            for (x = 0; x < sunkIndexes.length; x++) {
-                player.board[sunkIndexes[i]] = icons.sunk
+        if (shipSunk) {
+            for (x = 0; x < ship.length; x++) {
+                const index = ship[x]
+                player.board[index] = icons.sunk
+                sunkIcons += icons.sunk
             }
         } 
+        return sunkIcons
     }
+    */
 }
 
 function setupGame() {
