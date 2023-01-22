@@ -150,7 +150,7 @@ function shuffleShipPositions(size = 0, shipList = [], board) {
     /*
     // Debug log
     let generatedPosition = []
-    for (i = 0; i < indexSet.length; i++) {
+    for (let i = 0; i < indexSet.length; i++) {
         generatedPosition.push(board[indexSet[i]]) 
     }
     console.log(generatedPosition)
@@ -268,10 +268,10 @@ function printBoard(player) {
     let graphicBoard = player.board.slice()
     
     // Place ships graphically
-    for (i = 0; i < player.shipPositions.length; i++) {
+    for (let i = 0; i < player.shipPositions.length; i++) {
         const ship = player.shipPositions[i]
 
-        for (j = 0; j < ship.length; j++) {
+        for (let j = 0; j < ship.length; j++) {
             const icon = iconFor(ship.length)
             const index = ship[j]
             if (icon.length > 0 && graphicBoard[index] != icons.hit && graphicBoard[index] != icons.sunk) {
@@ -281,7 +281,7 @@ function printBoard(player) {
     }
 
     // translate empty positions
-    for (i = 0; i < graphicBoard.length; i++) {
+    for (let i = 0; i < graphicBoard.length; i++) {
         if (!iconList.includes(graphicBoard[i])) {
             graphicBoard[i] = icons.empty
         }
@@ -317,9 +317,9 @@ function checkForSunkShips(player, hit) {
     let hitShip = []
 
     // 1. Find the hit
-    for (i = 0; i < player.shipPositions.length; i++) {
+    for (let i = 0; i < player.shipPositions.length; i++) {
         const ship = player.shipPositions[i].slice()
-        for (j = 0; j < ship.length; j++) {
+        for (let j = 0; j < ship.length; j++) {
             if (ship[j] == hit) {
                 hitShip = ship.slice()
                 break
@@ -336,8 +336,7 @@ function checkForSunkShips(player, hit) {
 
     //2. Check if it is sunk
     let isSunk = true
-    
-    for (j = 0; j < hitShip.length; j++) {
+    for (let j = 0; j < hitShip.length; j++) {
         const index = hitShip[j]
         if (player.board[index] != icons.hit) {
             isSunk = false
