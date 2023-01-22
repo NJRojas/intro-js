@@ -46,9 +46,6 @@ class Player {
 
         // 2. place ships
         this.positionShips()
-
-        //3. Display setup
-        this.display()
     }
 
     createBoard() {
@@ -141,10 +138,6 @@ class Player {
     }
 
     display() {
-        const header = `${line}\n\n                              BATTLESHIP\n${line}`
-        const description = `\nDescription \n\n${icons.ship2}  -> Ship of 2 positions \n${icons.ship3}  -> Ship of 3 positions \n${icons.ship4}  -> Ship of 4 positions \n${icons.ship5}  -> Ship of 5 positions \n${icons.hit}  -> Hit a ship \n${icons.water}  -> Water or missing shot \n${icons.sunk}  -> Ship sunken \n${icons.empty} -> Empty position`
-        console.log(`${header}\n${description}`)
-
         console.log(`\nPlayer ${this.name}`)
         this.printTable()
     }
@@ -395,11 +388,11 @@ function play() {
     console.log(`\n${line}\n\nLet us begin the game\n${line}`)
 
     let winner
-    let flatShipPositionsA = playerA.shipPositions.flatMap(num => num)
-    let flatShipPositionsB = playerB.shipPositions.flatMap(num => num)
+    let flatShipPositionsA = player_A.shipPositions.flatMap(num => num)
+    let flatShipPositionsB = player_B.shipPositions.flatMap(num => num)
     
-    let currentPlayer = playerA
-    let rival = playerB
+    let currentPlayer = player_A
+    let rival = player_B
     let targetPositions = flatShipPositionsB
 
     do {
@@ -414,12 +407,12 @@ function play() {
 
         // Swap current player
         if (currentPlayer.name == 'A') {
-            currentPlayer = playerB
-            rival = playerA
+            currentPlayer = player_B
+            rival = player_A
             targetPositions = flatShipPositionsA
         } else {
-            currentPlayer = playerA
-            rival = playerB
+            currentPlayer = player_A
+            rival = player_B
             targetPositions = flatShipPositionsB
         }
 
@@ -525,15 +518,11 @@ function checkForSunkShips(player, hit) {
 
 function setupGame() {
 
-    // create boards
-    playerA.board = generateBoard()
-    playerB.board = generateBoard()
+    // 1. Create boards & place ships
+    player_A.setup()
+    player_B.setup()
 
-    // Place ships
-    placeShips(playerA)
-    placeShips(playerB)
-
-    // Shows initial configuration, boards with ships positioned
+    // Shows initial configuration, boards with positioned ships 
     displaySetup()
 }
 
@@ -542,8 +531,8 @@ function displaySetup() {
     const description = `\nDescription \n\n${icons.ship2}  -> Ship of 2 positions \n${icons.ship3}  -> Ship of 3 positions \n${icons.ship4}  -> Ship of 4 positions \n${icons.ship5}  -> Ship of 5 positions \n${icons.hit}  -> Hit a ship \n${icons.water}  -> Water or missing shot \n${icons.sunk}  -> Ship sunken \n${icons.empty} -> Empty position`
     console.log(`${header}\n${description}`)
 
-    showStatus(playerA)
-    showStatus(playerB)
+    player_A.display()
+    player_B.display()
 }
 
 function showStatus(player) {
@@ -571,16 +560,14 @@ function iconFor(length) {
     }
 }
 
-// 1. Setup Game
-//setupGame()
 let player_A = new Player('A')
 let player_B = new Player('B')
 
-player_A.setup()
-player_B.setup()
+// 1. Setup Game
+setupGame()
 
 // 2. Play
-//play()
+play()
 
 /* TODO
 1. Print statistics
