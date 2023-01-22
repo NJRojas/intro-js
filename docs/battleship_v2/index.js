@@ -27,6 +27,26 @@ const iconList = ['🛶', '⛵️', '🚤', '🚢', '💥', '💧', '🔥']
 const line = '________________________________________________________________________'
 
 /**
+ * returns a ship icon representing a ship of the given legth
+ * @param {Int} length represents the lenght of a ship
+ * @returns {String}
+ */
+function iconFor(length) {
+    switch(length) {
+        case 2:
+            return icons.ship2
+        case 3:
+            return icons.ship3
+        case 4:
+            return icons.ship4
+        case 5:
+            return icons.ship5
+        default:
+            return '';
+    }
+}
+
+/**
  * 
  */
 class Player {
@@ -42,31 +62,32 @@ class Player {
 
     setup() {
         // 1. set board
-        this.createBoard()
+        this.setBoard()
 
         // 2. place ships
         this.positionShips()
     }
 
-    createBoard() {
-        letters.forEach((letter, index) => {
+    /**
+    * Set initial board (an array of strings with 100 positions) representing the board of 10 x 10
+    */
+    setBoard() {
+        letters.forEach((letter) => {
             letters.forEach((elem, elemIndex) => {
                 this.board.push(letter + elemIndex)
             })
         })
     }
 
-    positionShips(a) {
+    positionShips() {
         shipSizes.forEach(ship => this.shufflePositionFor(ship))
     }
 
     /**
     * Generate a random position for a ship, and adds into the current positioned ship list set
     * @param {Int} size represents the lenght of the ship to be positioned.
-    * @param {[Int]} shipList A list of positioned ships
-    * @param {[String]} board Player board to position ships on
     */
-    shufflePositionFor(size = 0) {
+    shufflePositionFor(size) {
 
         let indexSet = []
         const takenPositions = this.shipPositions.flatMap(num => num)
@@ -129,7 +150,7 @@ class Player {
         /*
         // Debug log
         let generatedPosition = []
-        for (i = 0; i < indexSet.length; i++) {
+        for (let i = 0; i < indexSet.length; i++) {
          generatedPosition.push(board[indexSet[i]]) 
         }
         console.log(generatedPosition)
@@ -147,7 +168,7 @@ class Player {
         // Copy board
         let graphicBoard = this.board.slice()
     
-        // Place ships graphically
+        // place ship icons
         for (let i = 0; i < this.shipPositions.length; i++) {
             const ship = this.shipPositions[i]
 
@@ -187,39 +208,6 @@ class Player {
     }
 }
 
-
-let playerA = {
-    name: 'A',
-    board: [],
-    shipPositions: [],
-    hits: [],
-    turns: 0,
-    shots : []
-}
-
-let playerB = {
-    name: 'B',
-    board: [],
-    shipPositions: [],
-    hits: [],
-    turns: 0,
-    shots : []
-}
-
-/**
- * Generates a board (an array of strings with 100 positions) representing the board of 10 x 10
- * @returns {[String]}  A board, which is an array of 100 elements full of indexes
- */
-function generateBoard() {
-    let board = []
-    for (let i = 0; i < letters.length; i++) {
-        for (let j = 0; j < letters.length; j++) {
-            board.push(letters[i] + j)
-        }
-    }
-    return board
-}
-
 /**
  * Generates a random number from 0 to max
  * @return an integer within the range [0, max]
@@ -240,89 +228,6 @@ function flipChoice(optionA = 'A', optionB = 'B') {
         return optionA
     } else {
         return optionB
-    }
-}
-
-/**
- * Generate a random position for a ship, and adds into the current positioned ship list set
- * @param {Int} size represents the lenght of the ship to be positioned.
- * @param {[Int]} shipList A list of positioned ships
- * @param {[String]} board Player board to position ships on
- */
-function shuffleShipPositions(size = 0, shipList = [], board) {
-
-    let indexSet = []
-    const takenPositions = shipList.flatMap(num => num)
-
-    function generateIndexesIncreasing(from, to, letterFrom) {
-        for (let i = from; i < to; i++) {
-            const position = letterFrom + i
-            const index = board.indexOf(position)
-            if (takenPositions.includes(index)) {
-                indexSet = []
-                break
-            } else {
-                indexSet.push(index)
-            }
-        }
-    }
-
-    function generateIndexDecreasing(from, to, letterFrom) {
-        for (let i = from; i > to; i--) {
-            const position = letterFrom + i
-            const index = board.indexOf(position)
-            if (takenPositions.includes(index)) {
-                indexSet = []
-                break
-            } else {
-                indexSet.push(index)
-            }
-        }
-    }
-
-    do {
-        let indexFrom = getRandomInt()
-        let letterFrom = letters[indexFrom]
-        let direction = flipChoice()
-
-        // Try horizontal, which option A
-         if (direction == 'A') {
-            if ((indexFrom + size - 1) < dimention) {
-                // From right to left
-                generateIndexesIncreasing(indexFrom, indexFrom + size, letterFrom)
-
-            } else if ((indexFrom - size + 1) > 0) {
-                // From left to right
-                generateIndexDecreasing(indexFrom, indexFrom - size, letterFrom)
-            }
-
-        } else {
-            // Try vertical, which option B
-            if ((indexFrom + size - 1) < dimention) {
-                // From right to left
-                generateIndexesIncreasing(indexFrom, indexFrom + size, letterFrom)
-
-            } else if ((indexFrom - size + 1) > 0) {
-                // From left to right
-                generateIndexDecreasing(indexFrom, indexFrom - size, letterFrom)
-
-            }
-        } 
-    } while (indexSet.length == 0)
-    /*
-    // Debug log
-    let generatedPosition = []
-    for (let i = 0; i < indexSet.length; i++) {
-        generatedPosition.push(board[indexSet[i]]) 
-    }
-    console.log(generatedPosition)
-    */
-    shipList.push(indexSet)
-}
-
-function placeShips(player) {
-    for(let i = 0; i < shipSizes.length; i++) {
-        shuffleShipPositions(shipSizes[i], player.shipPositions, player.board)
     }
 }
 
@@ -369,14 +274,14 @@ function shoot(shooter, rival, target) {
             shoot(shooter, rival, target)
         } else {
             console.log(`Updating board of player ${rival.name}`)
-            printBoard(rival)
+            rival.printTable()
         }
 
     } else {
         rival.board[index] = icons.water
         console.log(`Shot position: ${shot} -> ${rival.board[index]}, you"ll do better next shot `)
         console.log(`Updating board of player ${rival.name}`)
-        printBoard(rival)
+        rival.printTable()
     }
  }
 
@@ -388,11 +293,11 @@ function play() {
     console.log(`\n${line}\n\nLet us begin the game\n${line}`)
 
     let winner
-    let flatShipPositionsA = player_A.shipPositions.flatMap(num => num)
-    let flatShipPositionsB = player_B.shipPositions.flatMap(num => num)
+    let flatShipPositionsA = playerA.shipPositions.flatMap(num => num)
+    let flatShipPositionsB = playerB.shipPositions.flatMap(num => num)
     
-    let currentPlayer = player_A
-    let rival = player_B
+    let currentPlayer = playerA
+    let rival = playerB
     let targetPositions = flatShipPositionsB
 
     do {
@@ -406,13 +311,13 @@ function play() {
         }
 
         // Swap current player
-        if (currentPlayer.name == 'A') {
-            currentPlayer = player_B
-            rival = player_A
+        if (currentPlayer.name == playerA.name) {
+            currentPlayer = playerB
+            rival = playerA
             targetPositions = flatShipPositionsA
         } else {
-            currentPlayer = player_A
-            rival = player_B
+            currentPlayer = playerA
+            rival = playerB
             targetPositions = flatShipPositionsB
         }
 
@@ -422,54 +327,8 @@ function play() {
 }
 
 /**
- * @param {{}} player Player owner of the board to be print
- */
-function printBoard(player) {
-    
-    // Copy board
-    let graphicBoard = player.board.slice()
-    
-    // Place ships graphically
-    for (i = 0; i < player.shipPositions.length; i++) {
-        const ship = player.shipPositions[i]
-
-        for (j = 0; j < ship.length; j++) {
-            const icon = iconFor(ship.length)
-            const index = ship[j]
-            if (icon.length > 0 && graphicBoard[index] != icons.hit && graphicBoard[index] != icons.sunk) {
-                graphicBoard[index] = icon
-            }
-        }
-    }
-
-    // translate empty positions
-    for (i = 0; i < graphicBoard.length; i++) {
-        if (!iconList.includes(graphicBoard[i])) {
-            graphicBoard[i] = icons.empty
-        }
-    }
-
-    const boardLine = '\n-----------------------------------------------------------------------'
-    const header    = `\n| (INDEX) |  0  |  1  |  2  |  3  |  4  |  5  |  6  |  7  |  8  |  9  |`
-    let board = `${boardLine}${header}${boardLine}`
-
-    for (let i = 0; i < letters.length; i++) {
-        let row = `|    ${letters[i]}    |`
-        for (let j = 0; j < letters.length; j++) {
-            const index = (i * 10) + j
-            if (graphicBoard[index] == "' '") {
-                row += ` ${graphicBoard[index]} |`
-            } else {
-                row += ` ${graphicBoard[index]}  |`
-            }
-        }
-        board += `\n${row}${boardLine}`
-    }
-    console.log(board)
-}
-
-/**
- * Looks for the latest hit ship and verifies if is sunk, if it is sunk, updates the ship with '🔥' and returns a strings of '🔥' according to the lentgh of the hit ship
+ * Looks for the latest hit ship and verifies if is sunk, if it is sunk, 
+ * updates the ship with '🔥' and returns a strings of '🔥' according to the lentgh of the hit ship
  * @param {{}} player A dictionary of the target player
  * @param {Int} hit Index position of the latest hit
  * @returns {String} messeage to log
@@ -479,17 +338,13 @@ function checkForSunkShips(player, hit) {
     let hitShip = []
 
     // 1. Find the hit
-    for (i = 0; i < player.shipPositions.length; i++) {
-        const ship = player.shipPositions[i].slice()
-        for (j = 0; j < ship.length; j++) {
-            if (ship[j] == hit) {
-                hitShip = ship.slice()
-                break
-            }
-        } 
-        if (hitShip.length > 0 ) {
+    for (let i = 0; i < player.shipPositions.length; i++) {
+        const ship = player.shipPositions[i]
+        const found = ship.find(elem => elem == hit)
+        if (typeof found != 'undefined') {
+            hitShip = ship.slice()
             break
-        } 
+        }
     }
 
     if (hitShip.length == 0) {
@@ -497,11 +352,9 @@ function checkForSunkShips(player, hit) {
     } 
 
     //2. Check if it is sunk
-    let isSunk = true
-    for (j = 0; j < hitShip.length; j++) {
+    for (let j = 0; j < hitShip.length; j++) {
         const index = hitShip[j]
         if (player.board[index] != icons.hit) {
-            isSunk = false
             return ""
         } 
     }
@@ -519,58 +372,23 @@ function checkForSunkShips(player, hit) {
 function setupGame() {
 
     // 1. Create boards & place ships
-    player_A.setup()
-    player_B.setup()
+    playerA.setup()
+    playerB.setup()
 
     // Shows initial configuration, boards with positioned ships 
-    displaySetup()
-}
-
-function displaySetup() {
     const header = `${line}\n\n                              BATTLESHIP\n${line}`
     const description = `\nDescription \n\n${icons.ship2}  -> Ship of 2 positions \n${icons.ship3}  -> Ship of 3 positions \n${icons.ship4}  -> Ship of 4 positions \n${icons.ship5}  -> Ship of 5 positions \n${icons.hit}  -> Hit a ship \n${icons.water}  -> Water or missing shot \n${icons.sunk}  -> Ship sunken \n${icons.empty} -> Empty position`
     console.log(`${header}\n${description}`)
 
-    player_A.display()
-    player_B.display()
+    playerA.display()
+    playerB.display()
 }
 
-function showStatus(player) {
-    console.log(`\nPlayer ${player.name}`)
-    printBoard(player)
-}
-
-/**
- * returns a ship icon representing a ship of the given legth
- * @param {Int} length represents the lenght of a ship
- * @returns {String}
- */
-function iconFor(length) {
-    switch(length) {
-        case 2:
-            return icons.ship2
-        case 3:
-            return icons.ship3
-        case 4:
-            return icons.ship4
-        case 5:
-            return icons.ship5
-        default:
-            return '';
-    }
-}
-
-let player_A = new Player('A')
-let player_B = new Player('B')
+let playerA = new Player('A')
+let playerB = new Player('B')
 
 // 1. Setup Game
 setupGame()
 
 // 2. Play
 play()
-
-/* TODO
-1. Print statistics
-2. Optimized, Divide in classes
-3. control no more than 100 shots
-*/
