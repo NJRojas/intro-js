@@ -10,8 +10,6 @@
   ' ' -> Empty position
 */
 
-// ******************************* Global Constants *******************************
-
 const letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
 const shipSizes = [2, 2, 2, 3, 3, 4, 5]
 const dimention = 10
@@ -27,8 +25,6 @@ const icons = {
 }
 const iconList = ['🛶', '⛵️', '🚤', '🚢', '💥', '💧', '🔥']
 const line = '_'.repeat(72)
-
-// ******************************* Math and util functions *******************************
 
 /**
  * returns a ship icon representing a ship of the given length
@@ -49,31 +45,6 @@ function iconFor(length) {
             return '';
     }
 }
-
-/**
- * Generates a random number from 0 to max
- * @return an integer within the range [0, max]
- */
-function getRandomInt(max = dimention) {
-    return Math.floor(Math.random() * max);
-}
-
-/**
- * Select in a random way between 2 options, simulate a flip coin
- * @param   {String} optionA Option 1 to flip
- * @param   {String} optionB Option 2 to flip
- * @returns {String} option result
- */
-function flipChoice(optionA = 'A', optionB = 'B') {
-    const value = Math.random()
-    if (value > 0.5) {
-        return optionA
-    } else {
-        return optionB
-    }
-}
-
-// ******************************* Math and util functions *******************************
 
 /**
  * Represents a player and has board and tracks 
@@ -106,6 +77,7 @@ class Player {
     }
 
     positionShips() {
+        // Generate ship positions
         shipSizes.forEach(ship => this.shufflePositionFor(ship))
     }
 
@@ -193,21 +165,19 @@ class Player {
 
         // Copy board
         let graphicBoard = this.board.slice()
-    
-        // place ship icons
-        for (let i = 0; i < this.shipPositions.length; i++) {
+
+         // Update board, place the corresponding ship icon
+         for (let i = 0; i < this.shipPositions.length; i++) {
             const ship = this.shipPositions[i]
 
             for (let j = 0; j < ship.length; j++) {
                 const icon = iconFor(ship.length)
                 const index = ship[j]
-                if (icon.length > 0 && graphicBoard[index] != icons.hit && graphicBoard[index] != icons.sunk) {
-                    graphicBoard[index] = icon
-                }
+                graphicBoard[index] = icon
             }
         }
 
-        // translate empty positions
+        // Update empty positions
         for (let i = 0; i < graphicBoard.length; i++) {
             if (!iconList.includes(graphicBoard[i])) {
                 graphicBoard[i] = icons.empty
@@ -218,14 +188,14 @@ class Player {
         const header    = `\n| (INDEX) |  0  |  1  |  2  |  3  |  4  |  5  |  6  |  7  |  8  |  9  |`
         let table       = `\n${boardLine}${header}\n${boardLine}`
 
-        for (let i = 0; i < letters.length; i++) {
+        for (let i = 0; i < dimention; i++) {
             let row = `|    ${letters[i]}    |`
-            for (let j = 0; j < letters.length; j++) {
+            for (let j = 0; j < dimention; j++) {
                 const index = (i * 10) + j
-                if (graphicBoard[index] == icons.empty) {
-                    row += ` ${graphicBoard[index]} |`
+                if (this.board[index] == icons.empty) {
+                    row += ` ${this.board[index]} |`
                 } else {
-                    row += ` ${graphicBoard[index]}  |`
+                    row += ` ${this.board[index]}  |`
                 }
             }
             table += `\n${row}\n${boardLine}`
@@ -234,7 +204,29 @@ class Player {
     }
 }
 
-// ******************************* The Game *******************************
+/**
+ * Generates a random number from 0 to max
+ * @return an integer within the range [0, max]
+ */
+function getRandomInt(max = dimention) {
+    return Math.floor(Math.random() * max);
+}
+
+/**
+ * Select in a random way between 2 options, simulate a flip coin
+ * @param   {String} optionA Option 1 to flip
+ * @param   {String} optionB Option 2 to flip
+ * @returns {String} option result
+ */
+function flipChoice(optionA = 'A', optionB = 'B') {
+    const value = Math.random()
+    if (value > 0.5) {
+        return optionA
+    } else {
+        return optionB
+    }
+}
+
 /**
  * Selects a valid position, that is, it has not been taken before
  * and updates the board of the rival with the corresponding icon
