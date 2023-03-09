@@ -1,4 +1,4 @@
-import { letters } from "./globalData"
+import { letters, shipSizes, dimention } from "./globalData.js"
 import { getRandomInt, flipChoice } from "./mathUtils.js"
 import { printTable } from "./printer.js"
 
@@ -14,11 +14,11 @@ export class Player {
         this.hits = []
         this.turns = 0
         this.shots = []
-    }
+    };
 
     setup() {
-        this.setBoard()
-        this.positionShips()
+        this.setBoard();
+        this.positionShips();;
     }
 
     /**
@@ -29,11 +29,11 @@ export class Player {
             letters.forEach((elem, elemIndex) => {
                 this.board.push(letter + elemIndex)
             })
-        })
+        });
     }
 
     positionShips() {
-        shipSizes.forEach(ship => this.shufflePositionFor(ship))
+        shipSizes.forEach(ship => this.shufflePositionFor(ship));
     }
 
     /**
@@ -42,60 +42,60 @@ export class Player {
     */
     shufflePositionFor(size) {
 
-        let indexSet = []
-        const takenPositions = this.shipPositions.flatMap(num => num)
+        let indexSet = [];
+        const takenPositions = this.shipPositions.flatMap(num => num);
 
         function generateIndexesIncreasing(from, to, letterFrom, inBoard) {
             for (let i = from; i < to; i++) {
-                const position = letterFrom + i
-                const index = inBoard.indexOf(position)
+                const position = letterFrom + i;
+                const index = inBoard.indexOf(position);
                 if (takenPositions.includes(index)) {
-                    indexSet = []
-                    break
+                    indexSet = [];
+                    break;
                 } else {
-                    indexSet.push(index)
+                    indexSet.push(index);
                 }
             }
         }
 
         function generateIndexDecreasing(from, to, letterFrom, inBoard) {
             for (let i = from; i > to; i--) {
-                const position = letterFrom + i
-                const index = inBoard.indexOf(position)
+                const position = letterFrom + i;
+                const index = inBoard.indexOf(position);
                 if (takenPositions.includes(index)) {
-                    indexSet = []
-                    break
+                    indexSet = [];
+                    break;
                 } else {
-                    indexSet.push(index)
+                    indexSet.push(index);
                 }
             }
         }
 
         do {
-            const indexFrom = getRandomInt()
-            const letterFrom = letters[indexFrom]
-            const direction = flipChoice()
+            const indexFrom = getRandomInt();
+            const letterFrom = letters[indexFrom];
+            const direction = flipChoice();
 
             // Try horizontal, which option A
             if (direction == 'A') {
                 if ((indexFrom + size - 1) < dimention) {
                     // From right to left
-                     generateIndexesIncreasing(indexFrom, indexFrom + size, letterFrom, this.board)
+                     generateIndexesIncreasing(indexFrom, indexFrom + size, letterFrom, this.board);
 
                 } else if ((indexFrom - size + 1) > 0) {
                     // From left to right
-                    generateIndexDecreasing(indexFrom, indexFrom - size, letterFrom, this.board)
+                    generateIndexDecreasing(indexFrom, indexFrom - size, letterFrom, this.board);
                 }
 
             } else {
                 // Try vertical, which option B
                 if ((indexFrom + size - 1) < dimention) {
                     // From right to left
-                    generateIndexesIncreasing(indexFrom, indexFrom + size, letterFrom, this.board)
+                    generateIndexesIncreasing(indexFrom, indexFrom + size, letterFrom, this.board);
 
                 } else if ((indexFrom - size + 1) > 0) {
                     // From left to right
-                    generateIndexDecreasing(indexFrom, indexFrom - size, letterFrom, this.board)
+                    generateIndexDecreasing(indexFrom, indexFrom - size, letterFrom, this.board);
                 }
             } 
         } while (indexSet.length == 0)
@@ -108,16 +108,16 @@ export class Player {
         }
         console.log(generatedPosition)
         */
-        this.shipPositions.push(indexSet)
+        this.shipPositions.push(indexSet);
     }
 
     display() {
-        console.log(`\nPlayer ${this.name}`)
-        printTable()
+        console.log(`\nPlayer ${this.name}`);
+        this.showStatus();
     }
 
-    printTable() {
-        printTable(this.board, this.shipPositions)
+    showStatus() {
+        printTable(this.board, this.shipPositions);
     }
 
 }

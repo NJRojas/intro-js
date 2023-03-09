@@ -1,0 +1,17 @@
+{
+  "name": "XIV-Intro-js Battleship Game",
+  "version": "1.0.0",
+  "description": "A simulator of the battleship game",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/NJRojas/intro-js.git"
+  },
+  "author": "NJ Skywalker",
+  "license": "ISC",
+  "homepage": "https://github.com/NJRojas/intro-js/blob/main/README.md",
+  "type": "module"
+}
