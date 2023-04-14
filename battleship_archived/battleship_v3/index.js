@@ -117,7 +117,7 @@ class Player {
         }
 
         do {
-            const indexFrom = getRandomInt()
+            const indexFrom = getRandomInt(dimention)
             const letterFrom = letters[indexFrom]
             const direction = flipChoice()
 

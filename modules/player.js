@@ -14,6 +14,7 @@ export class Player {
         this.hits = []
         this.turns = 0
         this.shots = []
+        this.availableShots = Array.from(Array(100).keys());
     };
 
     setup() {
@@ -72,7 +73,7 @@ export class Player {
         }
 
         do {
-            const indexFrom = getRandomInt();
+            const indexFrom = getRandomInt(dimention);
             const letterFrom = letters[indexFrom];
             const direction = flipChoice();
 

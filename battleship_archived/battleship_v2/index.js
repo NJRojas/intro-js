@@ -119,7 +119,7 @@ function shuffleShipPositions(size = 0, shipList = [], board) {
     }
 
     do {
-        let indexFrom = getRandomInt()
+        let indexFrom = getRandomInt(dimention)
         let letterFrom = letters[indexFrom]
         let direction = flipChoice()
 

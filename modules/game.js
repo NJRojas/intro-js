@@ -65,7 +65,7 @@ export function play() {
 }
 
 /**
- * Selects a valid position, that is, it has not been taken before
+ * Gets a valid shot, that is, it has not been taken before
  * and updates the board of the rival with the corresponding icon
  * It requires
  * @param {[Strings]}   target      A flat list of shipment positions of the rival.
@@ -73,22 +73,14 @@ export function play() {
  * @param {{}}          rival       A dictionary representing the target player.
  */
 function shoot(shooter, rival, target) {
-    let shot;
-    let index;
 
-    // Get a valid index
-    do {
-        index = getRandomInt(rival.board.length - 1);
-
-        // Check if it is not a taken position
-        if (!shooter.shots.includes(index)) {
-            shot = rival.board[index].slice();
-        }
-
-    } while (typeof shot == 'undefined')
-
+    const i = getRandomInt(shooter.availableShots.length);
+    const index = shooter.availableShots[i]
+    const shot = rival.board[index].slice();
+    
     // track shots
     shooter.shots.push(index);
+    shooter.availableShots.splice(i, 1);
 
     if (target.includes(index)) {
         rival.board[index] = icons.hit;

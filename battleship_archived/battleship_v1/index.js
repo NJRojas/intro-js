@@ -95,7 +95,7 @@ function shuffleShipPositions(size = 0, shipList = []) {
     const takenPositions = shipList.flatMap(num => num)
 
     do {
-        let indexFrom = getRandomInt()
+        let indexFrom = getRandomInt(dimention)
         let letterFrom = letters[indexFrom]
         let direction = flipChoice()
 
