@@ -65,7 +65,7 @@ export function play() {
 }
 
 /**
- * Gets a valid shot, that is, it has not been taken before
+ * Gets a valid shot, that is, it has not been shot before
  * and updates the board of the rival with the corresponding icon
  * It requires
  * @param {[Strings]}   target      A flat list of shipment positions of the rival.

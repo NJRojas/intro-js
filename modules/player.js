@@ -1,5 +1,5 @@
 import { letters, shipSizes, dimention } from "./globalData.js"
-import { getRandomInt, flipChoice } from "./mathUtils.js"
+import { getRandomInt } from "./mathUtils.js"
 import { printTable } from "./printer.js"
 
 /**
@@ -34,71 +34,49 @@ export class Player {
     }
 
     positionShips() {
-        shipSizes.forEach(ship => this.shufflePositionFor(ship));
+        shipSizes.forEach(ship => this.shufflePositionForShipOfSize(ship));
     }
 
     /**
     * Generate a random position for a ship, and adds into the current positioned ship list set
     * @param {Int} size represents the lenght of the ship to be positioned.
     */
-    shufflePositionFor(size) {
+    shufflePositionForShipOfSize(size) {
 
         let indexSet = [];
         const takenPositions = this.shipPositions.flatMap(num => num);
 
-        function generateIndexesIncreasing(from, to, letterFrom, inBoard) {
-            for (let i = from; i < to; i++) {
-                const position = letterFrom + i;
-                const index = inBoard.indexOf(position);
-                if (takenPositions.includes(index)) {
-                    indexSet = [];
-                    break;
-                } else {
-                    indexSet.push(index);
-                }
-            }
-        }
-
-        function generateIndexDecreasing(from, to, letterFrom, inBoard) {
-            for (let i = from; i > to; i--) {
-                const position = letterFrom + i;
-                const index = inBoard.indexOf(position);
-                if (takenPositions.includes(index)) {
-                    indexSet = [];
-                    break;
-                } else {
-                    indexSet.push(index);
-                }
-            }
-        }
-
         do {
             const indexFrom = getRandomInt(dimention);
             const letterFrom = letters[indexFrom];
-            const direction = flipChoice();
 
-            // Try horizontal, which option A
-            if (direction == 'A') {
-                if ((indexFrom + size - 1) < dimention) {
-                    // From right to left
-                     generateIndexesIncreasing(indexFrom, indexFrom + size, letterFrom, this.board);
-
-                } else if ((indexFrom - size + 1) > 0) {
-                    // From left to right
-                    generateIndexDecreasing(indexFrom, indexFrom - size, letterFrom, this.board);
+            if ((indexFrom + size - 1) < dimention) {
+                // From right to left
+                for (let i = indexFrom; i < indexFrom + size; i++) {
+                    const position = letterFrom + i;
+                    const index = this.board.indexOf(position);
+                    if (takenPositions.includes(index)) {
+                        indexSet = [];
+                        break;
+                    } else {
+                        indexSet.push(index);
+                    }
                 }
 
-            } else {
-                // Try vertical, which option B
-                if ((indexFrom + size - 1) < dimention) {
-                    // From right to left
-                    generateIndexesIncreasing(indexFrom, indexFrom + size, letterFrom, this.board);
-
-                } else if ((indexFrom - size + 1) > 0) {
-                    // From left to right
-                    generateIndexDecreasing(indexFrom, indexFrom - size, letterFrom, this.board);
+            } else if ((indexFrom - size + 1) > 0) {
+                // From left to right
+                for (let i = indexFrom; i > indexFrom - size; i--) {
+                    const position = letterFrom + i;
+                    const index = this.board.indexOf(position);
+                    if (takenPositions.includes(index)) {
+                        indexSet = [];
+                        break;
+                    } else {
+                        indexSet.push(index);
+                    }
                 }
-            } 
+            }
+          
         } while (indexSet.length == 0)
         
         /*
